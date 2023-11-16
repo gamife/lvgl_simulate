@@ -41,6 +41,10 @@
 			<Add directory="." />
 		</Compiler>
 		<Unit filename="lv_conf.h" />
+		<Unit filename="lv_custom/lv_custom.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lv_custom/lv_custom.h" />
 		<Unit filename="lv_drivers/display/ILI9341.h" />
 		<Unit filename="lv_drivers/display/R61581.h" />
 		<Unit filename="lv_drivers/display/SHARP_MIP.h" />

@@ -4,7 +4,9 @@ PC simulator project for LittlevGL embedded GUI Library for Windows in Codeblock
 This requires the MinGW version of **CodeBlocks 20.03 or newer** to be installed.
 
 ## How to use this:
-
+```bash
+git clone --recursive https://github.com/gamife/lvgl_simulate.git --depth 1
+```
 ###  Tutorial for Windows
 1) Download and install [Git](https://git-scm.com/downloads) 
 2) Download [CodeBlocks](https://www.codeblocks.org/downloads/) in latest version. It is *strongly* recommended to use the version which includes MinGW, as otherwise you will have to install and configure it separately, and there have been issues reported with missing header files when a standalone MinGW installation is used.
@@ -15,3 +17,6 @@ This requires the MinGW version of **CodeBlocks 20.03 or newer** to be installed
 5) Click on **Build and Run** or press **F9**. 
 6) If everything goes well, you should see your simulator running.  
 
+
+## 杂项
+1) 如果lv_custom目录在 codeblocks中没有显示，右键点击左边project/Workspace/LittlevGL/Add file

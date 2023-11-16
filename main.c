@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include "lvgl/lvgl.h"
+#include "lv_custom/lv_custom.h"
 #include "lv_drivers/win32drv/win32drv.h"
 
 #include <windows.h>
@@ -53,7 +54,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR szCmdLi
     LV_LOG_USER("LVGL initialization completed!");
 
     /*Run the demo*/
-    lv_demo_widgets();
+    // lv_demo_widgets();
+    lvgl_style_init();
+    LV_LOG_USER("custom completed!");
 
     while(!lv_win32_quit_signal) {
         /* Periodically call the lv_task handler.
