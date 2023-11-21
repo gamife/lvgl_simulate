@@ -45,8 +45,87 @@ void debug_color2(lv_color_t color){
 
 }
 
+
+void test_grid_layout(void)
+{
+    // 设置单元格的行数和列数, 以及各行各列的大小, FR是占用剩余空间的比例, 是一个相对值, 而数值是绝对值
+    /*Column 1: fix width 60 px
+     *Column 2: 1 unit from the remaining free space
+     *Column 3: 2 unit from the remaining free space*/
+    static lv_coord_t col_dsc[] = {60, LV_GRID_FR(1), LV_GRID_FR(2), LV_GRID_TEMPLATE_LAST};
+
+    /*Row 1: fix width 50 px
+     *Row 2: 1 unit from the remaining free space
+     *Row 3: fix width 50 px*/
+    static lv_coord_t row_dsc[] = {50, LV_GRID_FR(1), 50, LV_GRID_TEMPLATE_LAST};
+
+    /*Create a container with grid*/
+    lv_obj_t * cont = lv_obj_create(lv_scr_act());
+    lv_obj_set_style_border_width(cont, 10, 0);
+    lv_obj_set_style_pad_all(cont,10, 0);
+    // 设置子对象之间的间距, 对于grid对象, 相当于设置单元格之间的间距
+    lv_obj_set_style_pad_gap(cont, 5, 0);
+    // 一定要先设置pad和border, 然后再设置内容的大小, 这样盒子会自动计算大小, 以保证pad和border不变, 以及得到期望的内容大小.
+    lv_obj_set_content_height(cont, 220);
+    lv_obj_set_content_width(cont, 300);
+    lv_obj_set_align(cont, LV_ALIGN_BOTTOM_RIGHT);
+
+    // 设置对象布局为 grid, 然后这个对象的子对象, 会自动排列
+    lv_obj_set_grid_dsc_array(cont, col_dsc, row_dsc);
+    // 这个还没搞懂什么意思
+    lv_obj_set_grid_align(cont, LV_GRID_ALIGN_STRETCH, LV_GRID_ALIGN_STRETCH);
+    
+    LV_LOG_USER("screen: =======");
+    lvgl_print_infos(lv_scr_act());
+    LV_LOG_USER("cont: =======");
+    lvgl_print_infos(cont);
+
+    lv_obj_t * label;
+    lv_obj_t * obj;
+    uint32_t i;
+    for(i = 0; i < 9; i++) {
+        uint8_t col = i % 3;
+        uint8_t row = i / 3;
+
+        obj = lv_obj_create(cont);
+        lv_obj_set_style_border_width(obj, 2, 0);
+        lv_obj_set_style_pad_all(obj,0, 0);
+        lv_obj_set_size(obj, 40,40);
+
+        LV_LOG_USER("obj-%d (%d,%d) before: =======", i, col, row);
+        lvgl_print_infos(obj);
+        
+        // 将子对象放置到单元格, col_pos和row_pos是单元格坐标, col_span和row_span是子对象占用几个单元格.
+        // 单元格对齐选项: 
+        //  1. LV_GRID_ALIGN_STRETCH. 不管子对象原本的box大小如何, 都会被重新设置为布局单元格的大小
+        //  2. LV_GRID_ALIGN_END/START/CENTER. 这个不会修改子对象的大小, 需要自己在这之前设置, 如果单元格比对象要大, 就能看到子对象相对单元格的位置
+        lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_CENTER,col, 1,
+                             LV_GRID_ALIGN_CENTER, row, 1);
+
+        LV_LOG_USER("obj-%d (%d,%d): =======", i, col, row);
+        lvgl_print_infos(obj);
+
+        label = lv_label_create(obj);
+        if (i == 0){
+            LV_LOG_USER("label: ------");
+            lvgl_print_infos(label);
+        }
+        lv_label_set_text_fmt(label, "-------========%d,%d", col, row);
+        // lable的文字并没有滚动显示... 不知道是不是在grid布局不生效
+        lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR );
+        lv_obj_center(label);
+        if (i == 0){
+            LV_LOG_USER("label: ------");
+            lvgl_print_infos(label);
+        }
+    }
+}
+
+
 void lvgl_style_init(void)
 {
+    test_grid_layout();
+    return;
     debug_color(lv_color_make(0xff, 0xff, 0xff));
     debug_color(lv_palette_main(LV_PALETTE_YELLOW));
     debug_color2(lv_palette_main(LV_PALETTE_GREEN));
@@ -214,7 +293,7 @@ void lvgl_style_init(void)
 
 void lvgl_print_infos(lv_obj_t *obj)
 {
-    int32_t x, y, border_width, pad_top, pad_bottom, pad_left, pad_right, w, h, content_w, content_h;
+    int32_t x, y, border_width, pad_top, pad_bottom, pad_left, pad_right,pad_row,pad_col ,w, h, content_w, content_h;
 
     lv_obj_update_layout(obj);
 
@@ -227,6 +306,8 @@ void lvgl_print_infos(lv_obj_t *obj)
     pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
     pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
     pad_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+    pad_row = lv_obj_get_style_pad_row(obj, LV_PART_MAIN);
+    pad_col = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
     w = lv_obj_get_width(obj);
     h = lv_obj_get_height(obj);
@@ -234,9 +315,10 @@ void lvgl_print_infos(lv_obj_t *obj)
     content_w = lv_obj_get_content_width(obj);
     content_h = lv_obj_get_content_height(obj);
 
-    LV_LOG_USER(" xy:\t%d,%d\n pad:\t\t%d,%d,%d,%d\n border:\t%d\n box_w_h:\t%d,%d\n content_w_h:\t%d,%d",
+    LV_LOG_USER(" xy:\t%d,%d\n pad:\t\t%d,%d,%d,%d\n pad_row_col:\t%d,%d\n border:\t%d\n box_w_h:\t%d,%d\n content_w_h:\t%d,%d",
                 x, y,
                 pad_top, pad_bottom, pad_left, pad_right,
+                pad_row, pad_col,
                 border_width,
                 w, h,
                 content_w, content_h);
