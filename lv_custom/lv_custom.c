@@ -10,8 +10,48 @@
 lv_style_t lvgl_WuBianKuang_cont_style;
 lv_style_t lvgl_desktop_BeiJing_style;
 
+lv_obj_t * obj_test;
+void debug_color(lv_color_t color){
+    obj_test = lv_obj_create(lv_scr_act());
+    lv_obj_t* obj = obj_test;
+    lv_obj_set_style_bg_color(obj, color, 0);
+    lv_obj_set_style_border_color(obj,lv_palette_main(LV_PALETTE_RED), 0);
+    lv_obj_set_style_border_width(obj, 5, 0);
+    lv_obj_align(obj, LV_ALIGN_TOP_MID, 0,0);
+}
+void debug_color2(lv_color_t color){
+    lv_obj_t * obj= lv_obj_create(obj_test);
+    lv_obj_set_style_bg_color(obj, color, 0);
+    lv_obj_set_style_border_color(obj,lv_palette_main(LV_PALETTE_RED), 0);
+    lv_obj_set_style_border_width(obj, 5, 0);
+    lv_obj_set_style_pad_all(obj, 0, 0);
+
+    // 设置两个图层怎么显示, 比如子对象是直接覆盖在父对象上, 还是由其他混合的方式
+    lv_obj_set_style_blend_mode(obj, LV_BLEND_MODE_NORMAL, 0);
+
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ELASTIC|LV_OBJ_FLAG_SCROLL_MOMENTUM );
+    lv_obj_clear_flag(obj_test, LV_OBJ_FLAG_SCROLL_ELASTIC );
+
+    lv_obj_set_width(obj, lv_pct(50));
+    lv_obj_set_height(obj, lv_pct(300));
+    // lv_obj_center(obj);
+    lv_obj_align(obj, LV_ALIGN_TOP_MID, 0,0);
+
+    LV_LOG_USER("=======");
+    lvgl_print_infos(obj_test);
+    LV_LOG_USER("=======");
+    lvgl_print_infos(obj);
+    LV_LOG_USER("=======");
+
+}
+
 void lvgl_style_init(void)
 {
+    debug_color(lv_color_make(0xff, 0xff, 0xff));
+    debug_color(lv_palette_main(LV_PALETTE_YELLOW));
+    debug_color2(lv_palette_main(LV_PALETTE_GREEN));
+
+
 
     lv_style_init(&lvgl_WuBianKuang_cont_style);
     lv_style_set_radius(&lvgl_WuBianKuang_cont_style, 0);        // 圆角
@@ -169,6 +209,7 @@ void lvgl_style_init(void)
     lv_obj_set_style_transition(btn1, &trans2, LV_STATE_DEFAULT);
     // 父对象可拖动
     // lv_obj_set_drag_parent(btn1, true);
+    // lv_obj_remove_style_all();
 }
 
 void lvgl_print_infos(lv_obj_t *obj)

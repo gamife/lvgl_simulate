@@ -58,6 +58,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR szCmdLi
     lvgl_style_init();
     LV_LOG_USER("custom completed!");
 
+    ui_init();
+
     while(!lv_win32_quit_signal) {
         /* Periodically call the lv_task handler.
          * It could be done in a timer interrupt or an OS task too.*/
